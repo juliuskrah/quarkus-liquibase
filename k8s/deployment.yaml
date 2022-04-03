@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: liquibase-with-quarkus
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: liquibase-with-quarkus
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: liquibase-with-quarkus
+    spec:
+      containers:
+      - env:
+        - name: QUARKUS_DATASOURCE_REACTIVE_URL
+          value: postgresql://localhost/fruits
+        - name: QUARKUS_DATASOURCE_USERNAME
+          value: quarkus
+        - name: QUARKUS_DATASOURCE_PASSWORD
+          value: quarkus
+        name: quarkus-app-api
+        image: nexdock.cellulant.co.ke/liquibase-quarkus
+        resources:
+          limits:
+            memory: "40Mi"
+            cpu: "80m"
+          requests:
+            memory: "20Mi"
+            cpu: "60m"
+        ports:
+        - containerPort: 8080
+          name: http
+      imagePullSecrets:
+        - name: nexdock

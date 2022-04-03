@@ -1,0 +1,11 @@
+apiVersion: getambassador.io/v2
+kind:  Mapping
+metadata:
+  name: liquibase-with-quarkus
+spec:
+  prefix: /
+  service: liquibase-with-quarkus.development:80
+  host: liquibase-with-quarkus.gomora.poc.tingg.africa
+  timeout_ms: 1000
+  connect_timeout_ms: 1000
+  idle_timeout_ms: 1000
