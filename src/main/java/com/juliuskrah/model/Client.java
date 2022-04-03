@@ -25,6 +25,5 @@ public class Client extends PanacheEntityBase implements Serializable {
     @Column(length = 40, unique = true)
     public String name;
     public String code;
-    @Column(name = "contact_person")
     public String contactPerson;
 }

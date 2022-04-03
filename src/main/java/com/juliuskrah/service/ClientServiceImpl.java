@@ -25,9 +25,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Uni<ClientWithServices> findClientById(UUID id) {
-        return Client.findById(id).map(client ->
-            toClientDto((Client)client)
-        );
+        return Client.<Client>findById(id).map(this::toClientDto);
     }
 
     @Override
@@ -38,9 +36,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Multi<ClientWithServices> findAllClients() {
-        return Client.findAll().stream().map(client -> 
-            toClientDto((Client)client)
-        );
+        return Client.<Client>findAll().stream().map(this::toClientDto);
     }
     
 }
