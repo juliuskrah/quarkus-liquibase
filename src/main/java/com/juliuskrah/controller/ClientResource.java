@@ -1,6 +1,5 @@
 package com.juliuskrah.controller;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
@@ -10,6 +9,7 @@ import javax.ws.rs.PathParam;
 import com.juliuskrah.dto.ClientWithServices;
 import com.juliuskrah.dto.ServiceDto;
 import com.juliuskrah.service.ClientService;
+import com.juliuskrah.service.CompanyService;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
@@ -21,6 +21,9 @@ public class ClientResource {
 
     @Inject
     ClientService clientService;
+    @Inject
+    CompanyService companyService;
+
     
     @GET @Path("/{id}")
     public Uni<ClientWithServices> client(@PathParam("id") UUID id) {
@@ -34,13 +37,11 @@ public class ClientResource {
 
     @GET @Path("/{code}/code")
     public CompletableFuture<ClientWithServices> clientByCode(@PathParam("code") String code) {
-        return CompletableFuture.completedFuture(
-            new ClientWithServices(UUID.randomUUID(), "Loretta Krah", code, "lorettakrah@cellulant.io", List.of())
-        );
+        return clientService.findClientByCode(code).subscribeAsCompletionStage();
     }
 
     @GET @Path("/{clientCode}/services")
     public Multi<ServiceDto> servicesByClient(@PathParam("clientCode") String clientCode) {
-        return Multi.createFrom().empty();
+        return companyService.findServicesForClient(clientCode);
     }
 }

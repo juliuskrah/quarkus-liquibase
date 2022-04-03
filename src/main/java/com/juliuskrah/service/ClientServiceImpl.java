@@ -2,9 +2,11 @@ package com.juliuskrah.service;
 
 import java.util.List;
 import java.util.UUID;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import com.juliuskrah.dto.ClientWithServices;
 import com.juliuskrah.model.Client;
+import com.juliuskrah.repository.ClientRepository;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
@@ -13,30 +15,40 @@ import io.smallrye.mutiny.Uni;
  */
 @Singleton
 public class ClientServiceImpl implements ClientService {
+    @Inject
+    ClientRepository clientRepository;
 
     private ClientWithServices toClientDto(Client client) {
         return new ClientWithServices(
-            client.id, 
-            client.name,
-            client.code, 
-            client.contactPerson, 
+            client.getId(), 
+            client.getName(),
+            client.getCode(), 
+            client.getContactPerson(), 
             List.of());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Uni<ClientWithServices> findClientById(UUID id) {
-        return Client.<Client>findById(id).map(this::toClientDto);
+        return clientRepository.findById(id).map(this::toClientDto);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Uni<ClientWithServices> findClientByCode(String code) {
-        // TODO Auto-generated method stub
-        return null;
+        return clientRepository.findByCodeIgnoreCase(code).map(this::toClientDto);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Multi<ClientWithServices> findAllClients() {
-        return Client.<Client>findAll().stream().map(this::toClientDto);
+        return clientRepository.findAll().stream().map(this::toClientDto);
     }
     
 }

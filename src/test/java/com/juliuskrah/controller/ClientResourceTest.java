@@ -44,10 +44,27 @@ class ClientResourceTest {
     @Test
     @DisplayName("Test mapping for /clients/{code}/code")
     void testClientByCode() {
+        Response response = given()
+                .when()
+                .get("/clients/{code}/code", "acme")
+                .then()
+                .statusCode(200)
+                .contentType("application/json")
+                .extract().response();
+        assertThat(response.jsonPath().getString("name")).isEqualTo("acme corporation");
     }
 
     @Test
     @DisplayName("Test mapping for /clients/{clientCode}/services")
     void testServicesByClient() {
+        Response response = given()
+                .when()
+                .get("/clients/{clientCode}/services", "hey")
+                .then()
+                .statusCode(200)
+                .contentType("application/json")
+                .extract().response();
+        assertThat(response.jsonPath().getList("name"))
+            .containsExactlyInAnyOrder("coffee", "pizza");
     }
 }
