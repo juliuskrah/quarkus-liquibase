@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.transaction.Transactional;
 import com.juliuskrah.dto.ClientWithServices;
 import com.juliuskrah.model.Client;
 import com.juliuskrah.repository.ClientRepository;
@@ -25,6 +26,14 @@ public class ClientServiceImpl implements ClientService {
             client.getCode(), 
             client.getContactPerson(), 
             List.of());
+    }
+
+    private Client fromClientDto(ClientWithServices clientDto) {
+        var client = new Client();
+        client.setName(clientDto.name());
+        client.setCode(clientDto.code());
+        client.setContactPerson(clientDto.contactPerson());
+        return client;
     }
 
     /**
@@ -49,6 +58,15 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public Multi<ClientWithServices> findAllClients() {
         return clientRepository.findAll().stream().map(this::toClientDto);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Transactional
+    @Override
+    public Uni<ClientWithServices> addClient(ClientWithServices client) {
+        return clientRepository.persist(fromClientDto(client)).map(this::toClientDto);
     }
     
 }

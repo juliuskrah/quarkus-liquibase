@@ -2,7 +2,9 @@ package com.juliuskrah.controller;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import java.util.List;
 import java.util.UUID;
+import com.juliuskrah.dto.ClientWithServices;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import io.quarkus.test.junit.QuarkusTest;
@@ -39,6 +41,22 @@ class ClientResourceTest {
                 .extract().response();
         assertThat(response.jsonPath().getList("name"))
             .containsExactlyInAnyOrder("hey foods", "freedom limited", "evil corp", "acme corporation");
+    }
+
+    @Test
+    @DisplayName("Test mapping for POST /clients/")
+    void testCreateClient() {
+        Response response = given()
+            .when()
+            .body(new ClientWithServices(null, "Brooklyn Nine Nine", "NINE_NINE", "Jake Paralta", List.of()))
+            .contentType("application/json")
+            .post("/clients")
+            .then()
+            .statusCode(201)
+            .contentType("application/json")
+            .extract().response();           
+        assertThat(response.header("location")).contains("/clients");
+        assertThat(response.jsonPath().getString("code")).isEqualTo("NINE_NINE");
     }
 
     @Test
