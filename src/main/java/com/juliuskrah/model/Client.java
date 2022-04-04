@@ -51,4 +51,10 @@ public class Client implements Serializable {
         this.contactPerson = contactPerson;
     }
     
+    @Override
+    public String toString() {
+        return "Client [code=" + code + ", contactPerson=" + contactPerson + ", id=" + id
+                + ", name=" + name + "]";
+    }
+    
 }

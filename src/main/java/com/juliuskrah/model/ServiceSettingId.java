@@ -18,24 +18,29 @@ public class ServiceSettingId implements Serializable {
     private Client receiverClient;
     @ManyToOne
     private Client payerClient;
-    
+
     public Service getService() {
         return service;
     }
+
     public void setService(Service service) {
         this.service = service;
     }
+
     public Client getReceiverClient() {
         return receiverClient;
     }
+
     public void setReceiverClient(Client receiverClient) {
         this.receiverClient = receiverClient;
     }
+
     public Client getPayerClient() {
         return payerClient;
     }
+
     public void setPayerClient(Client payerClient) {
         this.payerClient = payerClient;
     }
-    
+
 }

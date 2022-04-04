@@ -1,6 +1,6 @@
 package com.juliuskrah.model;
 
-import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.FetchType.EAGER;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -24,7 +24,8 @@ public class Service implements Serializable {
     private String code;
     private String currency;
     private String queueName;
-    @ManyToOne(fetch = LAZY)
+    // Fix change to LAZY once lazy loading is figured out
+    @ManyToOne(fetch = EAGER)
     private Client client;
     
     public UUID getId() {

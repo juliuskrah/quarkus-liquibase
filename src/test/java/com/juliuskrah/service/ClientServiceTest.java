@@ -21,7 +21,7 @@ import io.smallrye.mutiny.Uni;
  * @author Julius Krah
  */
 @QuarkusTest
-public class ClientServiceTest {
+class ClientServiceTest {
     @Inject
     ClientService clientService;
     @InjectMock

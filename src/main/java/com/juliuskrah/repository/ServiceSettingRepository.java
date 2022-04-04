@@ -1,11 +1,14 @@
 package com.juliuskrah.repository;
 
+import java.util.List;
 import java.util.UUID;
 import javax.enterprise.context.ApplicationScoped;
 import com.juliuskrah.model.ServiceSetting;
 import com.juliuskrah.model.ServiceSettingId;
 import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase;
+import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
 
 /**
  * @author Julius Krah
@@ -14,35 +17,14 @@ import io.smallrye.mutiny.Multi;
 public class ServiceSettingRepository implements PanacheRepositoryBase<ServiceSetting, ServiceSettingId> {
 
     public Multi<ServiceSetting> findByPayerClientId(UUID id) {
-        return find("""
-            SELECT 
-                ss 
-            FROM 
-                ServiceSetting ss 
-            WHERE 
-                ss.id.payerClient.id = ?1
-            """, id).stream();
+        return find("id.payerClient.id = ?1", id).stream();
     }
 
-    public Multi<ServiceSetting> findByReceiverClientId(UUID id){
-        return find("""
-            SELECT 
-                ss 
-            FROM 
-                ServiceSetting ss 
-            WHERE 
-                ss.id.receiverClient.id = :id
-            """, id).stream();
+    public Uni<List<ServiceSetting>> findByReceiverClientId(UUID id){
+        return find("id.receiverClient.id = :id", Parameters.with("id", id)).list();
     }
 
     public Multi<ServiceSetting> findByServiceId(UUID id) {
-        return find("""
-            SELECT
-                ss
-            FROM
-                ServiceSetting ss
-            WHERE
-                ss.id.service.id = :id
-            """, id).stream();
+        return find("id.service.id = :id", Parameters.with("id", id)).stream();
     }
 }
