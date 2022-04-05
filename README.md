@@ -62,3 +62,11 @@ If you want to learn more about building native executables, please consult http
 
 - https://quarkus.io/version/main/guides/hibernate-orm-panache
 - https://quarkus.io/guides/getting-started-reactive
+
+
+- Repositories
+- Services
+- Controllers
+- Tests
+- Native Build
+- JaCoCo

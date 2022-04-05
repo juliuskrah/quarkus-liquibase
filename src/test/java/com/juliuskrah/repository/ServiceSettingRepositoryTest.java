@@ -32,7 +32,6 @@ class ServiceSettingRepositoryTest {
     @Test
     @DisplayName("Test find by receiver client Id")
     void testFindByReceiverClientId() {
-        //var serviceSettings = serviceSettingRepository.findByReceiverClientId(UUID.fromString("b0c02363-5031-4c0c-9a83-f242df4039b1"));
         Panache.withTransaction(() -> 
             serviceSettingRepository.findByReceiverClientId(UUID.fromString("b0c02363-5031-4c0c-9a83-f242df4039b1"))
         )
