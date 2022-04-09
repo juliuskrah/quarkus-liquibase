@@ -70,3 +70,10 @@ If you want to learn more about building native executables, please consult http
 - Tests
 - Native Build
 - JaCoCo
+
+
+History of Quarkus
+- Wildfly: JavaEE
+- Wildfly Swarm
+- Thorntail: Microprofile
+- Quarkus: Jakarta EE / Microprofile

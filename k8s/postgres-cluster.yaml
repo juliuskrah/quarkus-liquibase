@@ -1,0 +1,24 @@
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: payouts-liquibase-cluster
+  labels:
+    app.kubernetes.io/name: payouts-liquibase-cluster
+spec:
+  teamId: payouts
+  numberOfInstances: 2
+  users:
+    liqubase:
+    - CREATEDB
+    quarkus_owner: []
+  databases:
+    quarkus: quarkus_owner
+  preparedDatabases:
+    quarkus:
+      defaultUsers: true
+      schemas:
+        liquibase: {}
+  postgresql:
+    version: "14"
+  volume:
+    size: "1Gi"

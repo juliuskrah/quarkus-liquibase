@@ -2,7 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: liquibase-with-quarkus
+  labels: 
+    app.kubernetes.io/name: liquibase-with-quarkus
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: liquibase-with-quarkus
@@ -11,16 +14,76 @@ spec:
       labels:
         app.kubernetes.io/name: liquibase-with-quarkus
     spec:
+      initContainers:
+      - env:
+        - name: URL
+          value: jdbc:postgresql://payouts-liquibase-cluster/quarkus?currentSchema=liquibase
+        - name: USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: quarkus-owner-user.payouts-liquibase-cluster.credentials.postgresql.acid.zalan.do
+              key: username
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: quarkus-owner-user.payouts-liquibase-cluster.credentials.postgresql.acid.zalan.do
+              key: password
+        name: liquibase-migration
+        image: liquibase/liquibase:4.9
+        args:
+          - "--url=$(URL)" 
+          - "--changeLogFile=db.changelog-master.xml" 
+          - "--username=$(USERNAME)"
+          - "--password=$(PASSWORD)"
+          - "--classpath=/liquibase/changelog"
+          - "update"
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "500Mi"
+          requests:
+            cpu: "100m"
+            memory: "500Mi"
+        volumeMounts:
+        - name: liquibase-volume
+          mountPath: /liquibase/changelog
+          readOnly: true
+      volumes:
+      - name: liquibase-volume
+        projected:
+          sources:
+          - configMap:
+              name: liquibase-with-quarkus
+              items:
+              - key: db.changelog-master.xml
+                path: db.changelog-master.xml
+              - key: client.csv
+                path: data/client.csv
+              - key: service.csv
+                path: data/service.csv
+              - key: service_setting.csv
+                path: data/service_setting.csv
       containers:
       - env:
         - name: QUARKUS_DATASOURCE_REACTIVE_URL
-          value: postgresql://localhost/fruits
+          value: postgresql://payouts-liquibase-cluster/quarkus
+        - name: QUARKUS_DATASOURCE_REACTIVE_POSTGRESQL_SSL_MODE
+          value: require
+        - name: QUARKUS_DATASOURCE_REACTIVE_TRUST_ALL
+          value: "true"
         - name: QUARKUS_DATASOURCE_USERNAME
-          value: quarkus
+          valueFrom:
+            secretKeyRef:
+              name: quarkus-owner-user.payouts-liquibase-cluster.credentials.postgresql.acid.zalan.do
+              key: username
         - name: QUARKUS_DATASOURCE_PASSWORD
-          value: quarkus
+          valueFrom:
+            secretKeyRef:
+              name: quarkus-owner-user.payouts-liquibase-cluster.credentials.postgresql.acid.zalan.do
+              key: password
         name: quarkus-app-api
         image: nexdock.cellulant.co.ke/liquibase-quarkus
+        imagePullPolicy: Always
         resources:
           limits:
             memory: "40Mi"
@@ -32,4 +95,4 @@ spec:
         - containerPort: 8080
           name: http
       imagePullSecrets:
-        - name: nexdock
+      - name: nexdock
