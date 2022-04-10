@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "quarkus-api-training.fullname" . }}
+  labels:
+    {{- include "quarkus-api-training.labels" . | nindent 4 }}
+  annotations:
+    {{- include "quarkus-api-training.annotations" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "quarkus-api-training.selectorLabels" . | nindent 4 }}

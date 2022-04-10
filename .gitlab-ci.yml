@@ -1,0 +1,161 @@
+include:
+  - project: 'ops-templates/ci-cd-extensions/base-cicd'
+    ref: v3.0.0
+    file: '.base.gitlab-ci.yml'
+    
+  - project: 'ops-templates/ci-cd-extensions/qa/code-quality'
+    ref: maven17
+    file: 'Code-Quality.gitlab-ci.yml'
+
+  
+#Main CI/CD lifecycle stages
+stages:
+  - build
+  - test
+  - deploy
+
+
+######## Change the variables below to fit specific project  
+variables:
+  ## System variables #Dont remove
+  extends: .base_variables
+
+  ### start: edit for project specific configs #Edit
+  MAVEN_CLI_OPTS: "-s settings.xml --batch-mode --errors --fail-at-end --show-version -Dnexus.username=$NEX_USER -Dnexus.password=$NEX_PASS"
+  ## Edit this section to configure the internet-facing proxy (ingress controller)
+  ##Development
+  # Configures development domain
+  # name of development config file
+  DEV_HOSTNAME: quarkus-api-training.dev.tingg.africa   
+  DEV_CONFIGFILE: application-development.properties 
+  
+  ##Testing
+  TEST_HOSTNAME: quarkus-api-training.test.tingg.africa 
+  TEST_CONFIGFILE: application-testing.properties
+
+  ##Approval
+  APPROVAL_HOSTNAME: quarkus-api-training.sandbox.tingg.africa 
+  APPROVAL_CONFIGFILE: application-approval.properties
+
+  ##Production
+  # Configures production domain
+  # name of production config file
+  PROD_HOSTNAME: quarkus-api-training.prod.tingg.africa 
+  PROD_CONFIGFILE: application-production.properties 
+
+
+  SERVICE_PORT: 8080 # port to expose service on
+  SERVICE_ENABLED: "true"
+
+  ## Enter the name of the project
+  PROJECT: quarkus-api-training
+  
+  ### Docker images config we use ecr for all our production images and nexus for 
+  IMG_REPO: quarkus-api-training/native # name of the docker registry 
+  PROD_IMG: 102430194655.dkr.ecr.us-east-2.amazonaws.com/quarkus-api-training/native # only chnage the suffix to same as IMG_REPO
+  DEV_IMG: nexdock.cellulant.co.ke/quarkus-api-training/native # only chnage the suffix to same as IMG_REPO
+
+  PRODREPLICAS: 2
+  APPROVALREPLICAS: 1
+  DEVREPLICAS: 1
+  TESTREPLICAS: 1
+  
+  
+
+#####Build stage jobs
+
+##Build development branch
+build:development:
+  extends: .base_build_script
+  variables:
+    K8_NAMESPACE: development
+    TAG: ${DEV_IMG}
+    CONFIGFILE: ${DEV_CONFIGFILE}
+  stage: build
+  only:
+    - master
+
+##Build testing branch
+build:testing:
+  extends: .base_build_script
+  variables:
+    K8_NAMESPACE: testing
+    TAG: ${DEV_IMG}
+    CONFIGFILE: ${TEST_CONFIGFILE}
+  stage: build
+  only:
+    - testing
+
+##Build approval branch
+build:approval:
+  extends: .base_build_script
+  variables:
+    K8_NAMESPACE: approval
+    TAG: ${PROD_IMG}
+    CONFIGFILE: ${APPROVAL_CONFIGFILE}
+  stage: build
+  only:
+    - approval
+
+##Build production branch
+build:production:
+  extends: .base_build_script
+  variables:
+    K8_NAMESPACE: production
+    TAG: ${PROD_IMG}
+    CONFIGFILE: ${PROD_CONFIGFILE}
+  stage: build
+  only:
+    - production
+
+# #####Test stage jobs
+
+test:default:
+  stage: test
+  script:
+    - echo "issa test stage"
+    - ./mvnw $MAVEN_CLI_OPTS test
+  only:
+    - merge_requests
+  tags:
+    - job-pipeline
+
+
+#####Deploy stage jobs
+
+#Deploy to development branch # Leave defaults
+deploy:development:
+  extends: .base_development_deploy_tags  
+  variables:
+    #APP specific configs - can change
+    SVC_HOSTNAME: ${DEV_HOSTNAME}
+    SERVICE_TYPE: ClusterIP #or NodePort for ingress service
+    INGRESS: "false"
+    
+
+deploy:testing:
+  extends: .base_testing_deploy_tags  
+  variables:
+    #APP specific configs - can change
+    SVC_HOSTNAME: ${TEST_HOSTNAME}
+    SERVICE_TYPE: ClusterIP #or NodePort for ingress service
+    INGRESS: "false"
+
+deploy:approval:
+  extends: .base_approval_deploy_tags  
+  variables:
+    #APP specific configs - can change
+    SVC_HOSTNAME: ${APPROVAL_HOSTNAME}
+    SERVICE_TYPE: ClusterIP #or NodePort for ingress service
+    INGRESS: "false"
+    K8_PROD_KEY: k8/ranch-prod/eks/eks-cellulant-infrastracture-eks-1
+
+#Deploy to production branch # Leave defaults
+deploy:production:
+  extends: .base_production_deploy_tags
+  variables:
+    #APP specific configs - can change
+    SVC_HOSTNAME: ${PROD_HOSTNAME}
+    SERVICE_TYPE: ClusterIP #or NodePort for ingress service
+    INGRESS: "false"
+    K8_PROD_KEY: k8/ranch-prod/eks/eks-cellulant-infrastracture-eks-1

@@ -1,0 +1,134 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "quarkus-api-training.fullname" . }}
+  labels:
+    {{- include "quarkus-api-training.labels" . | nindent 4 }}
+  annotations:
+    {{- include "quarkus-api-training.annotations" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "quarkus-api-training.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "quarkus-api-training.selectorLabels" . | nindent 8 }}
+    spec:
+{{- if .Values.image.pullSecrets }}
+      imagePullSecrets:
+      {{- range $pullSecret := .Values.image.pullSecrets }}
+        - name: {{ $pullSecret }}
+      {{- end }}
+{{- end }}
+      initContainers:
+      - env:
+        - name: URL
+          value: jdbc:postgresql://payouts-liquibase-cluster/quarkus?currentSchema=liquibase
+        - name: USERNAME
+          value: asdf
+          # valueFrom:
+          #   secretKeyRef:
+          #     name: liqubase.payouts-liquibase-cluster.credentials.postgresql.acid.zalan.do
+          #     key: username
+        - name: PASSWORD
+          value: asdf
+          # valueFrom:
+          #   secretKeyRef:
+          #     name: liqubase.payouts-liquibase-cluster.credentials.postgresql.acid.zalan.do
+          #     key: password
+        name: liquibase-migration
+        image: liquibase/liquibase:4.9
+        args:
+          - "--url=$(URL)" 
+          - "--changeLogFile=db.changelog-master.yaml" 
+          - "--username=$(USERNAME)"
+          - "--password=$(PASSWORD)"
+          - "--classpath=/liquibase/changelog"
+          - "update"
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "500Mi"
+          requests:
+            cpu: "100m"
+            memory: "500Mi"
+        volumeMounts:
+        - name: liquibase-volume
+          mountPath: /liquibase/changelog
+          readOnly: true
+      volumes:
+      - name: liquibase-volume
+        projected:
+          sources:
+          - configMap:
+              name: {{ include "quarkus-api-training.fullname" . }}
+              items:
+              - key: db.changelog-master.yaml
+                path: db.changelog-master.yaml
+              - key: client.csv
+                path: data/client.csv
+              - key: service.csv
+                path: data/service.csv
+              - key: service_setting.csv
+                path: data/service_setting.csv
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion | default .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+{{- if .Values.service.secrets.enabled }}
+          envFrom:
+            - secretRef:
+                name: {{ include "quarkus-api-training.fullname" . }}-secret 
+{{- end }}
+          env:
+  {{- range $key, $value := .Values.extraVars }}
+          - name: {{ $key }}
+            value: {{ $value }}
+  {{- end }}
+          - name: QUARKUS_DATASOURCE_USERNAME
+            value: asdf
+          - name: QUARKUS_DATASOURCE_PASSWORD
+            value: asdf
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP             
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}    
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- if or ( eq .Release.Namespace "production" ) (eq .Release.Namespace "approval") }}
+      tolerations:
+        - key: "nodes"
+          operator: "Equal"
+          value: "{{ .Values.service.nodegroup }}"
+          effect: "NoSchedule"
+    {{ else }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- end }}
+

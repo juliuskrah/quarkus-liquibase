@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+    <servers>
+        <server>
+            <id>cellulant-repo-snapshot</id>
+            <username>${env.NEX_USER}</username>
+            <password>${env.NEX_PASS}</password>
+        </server>
+        <server>
+            <id>cellulant-repo-release</id>
+            <username>${env.NEX_USER}</username>
+            <password>${env.NEX_PASS}</password>
+        </server>
+        <server>
+            <id>nexdock.cellulant.co.ke</id>
+            <username>${env.NEX_USER}</username>
+            <password>${env.NEX_PASS}</password>
+        </server>
+        <server>
+            <id>cellulant-repo</id>
+            <username>${env.NEX_USER}</username>
+            <password>${env.NEX_PASS}</password>
+        </server>
+    </servers>
+</settings>

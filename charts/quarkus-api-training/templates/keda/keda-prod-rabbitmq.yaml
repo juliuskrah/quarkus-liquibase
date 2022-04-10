@@ -1,0 +1,52 @@
+# see docs https://keda.sh/docs/2.6/scalers/rabbitmq-queue/
+# Enable scaler in valuse.yaml. Set key: Values.keda.rabbitmq.enabled = true
+{{- if .Values.keda.rabbitmq.enabled -}}
+{{- if ( eq .Release.Namespace "production" ) }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "keda-rabbitmq-secret-{{ .Chart.Name }}-{{ .Release.Namespace }}"
+  namespace: production
+  labels:
+    {{- include "quarkus-api-training.labels" . | nindent 4 }}
+data:
+  host: "{{ .Values.keda.host }}"
+---
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: "keda-trigger-auth-rabbitmq-{{ .Chart.Name }}-{{ .Release.Namespace }}"
+  namespace: production
+  labels:
+    {{- include "quarkus-api-training.labels" . | nindent 4 }}
+spec:
+  secretTargetRef:
+    - parameter: host
+      name: "keda-rabbitmq-secret-{{ .Chart.Name }}-{{ .Release.Namespace }}"
+      key: host
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: "rabbitmq-scaledobject-{{ .Chart.Name }}-{{ .Release.Namespace }}"
+  namespace: production
+  labels:
+    {{- include "quarkus-api-training.labels" . | nindent 4 }}
+spec:
+  minReplicaCount: {{ .Values.keda.rabbitmq.minReplicaCount }}
+  pollingInterval: {{ .Values.keda.rabbitmq.pollingInterval }}   # Optional. Default: 30 seconds
+  cooldownPeriod: {{ .Values.keda.rabbitmq.cooldownPeriod }}   # Optional. Default: 300 seconds
+  maxReplicaCount: {{ .Values.keda.rabbitmq.maxReplicaCount }}  # Optional. Default: 100
+  scaleTargetRef:
+    name: "rabbitmq-{{ .Chart.Name }}-{{ .Release.Namespace }}"
+  triggers:
+  - type: rabbitmq
+    metadata:
+      protocol: amqp
+      queueName: "{{ .Values.keda.rabbitmq.queueName }}"
+      mode: QueueLength
+      value: "{{ .Values.keda.rabbitmq.value }}"
+    authenticationRef:
+      name: "keda-trigger-auth-rabbitmq-{{ .Chart.Name }}-{{ .Release.Namespace }}"
+{{- end -}}
+{{- end }}

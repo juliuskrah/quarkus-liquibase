@@ -21,20 +21,21 @@ spec:
         - name: USERNAME
           valueFrom:
             secretKeyRef:
-              name: quarkus-owner-user.payouts-liquibase-cluster.credentials.postgresql.acid.zalan.do
+              name: liqubase.payouts-liquibase-cluster.credentials.postgresql.acid.zalan.do
               key: username
         - name: PASSWORD
           valueFrom:
             secretKeyRef:
-              name: quarkus-owner-user.payouts-liquibase-cluster.credentials.postgresql.acid.zalan.do
+              name: liqubase.payouts-liquibase-cluster.credentials.postgresql.acid.zalan.do
               key: password
         name: liquibase-migration
         image: liquibase/liquibase:4.9
         args:
           - "--url=$(URL)" 
-          - "--changeLogFile=db.changelog-master.xml" 
+          - "--changeLogFile=db.changelog-master.yaml" 
           - "--username=$(USERNAME)"
           - "--password=$(PASSWORD)"
+          # - "--log-level=debug"
           - "--classpath=/liquibase/changelog"
           - "update"
         resources:
@@ -55,8 +56,8 @@ spec:
           - configMap:
               name: liquibase-with-quarkus
               items:
-              - key: db.changelog-master.xml
-                path: db.changelog-master.xml
+              - key: db.changelog-master.yaml
+                path: db.changelog-master.yaml
               - key: client.csv
                 path: data/client.csv
               - key: service.csv

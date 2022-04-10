@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: liquibase-with-quarkus
+  name: {{ include "quarkus-api-training.fullname" . }}
   labels:
-    app.kubernetes.io/name: liquibase-with-quarkus
+    {{- include "quarkus-api-training.labels" . | nindent 4 }}
 data:
   db.changelog-master.yaml: |-
     databaseChangeLog:

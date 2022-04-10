@@ -1,0 +1,29 @@
+# see docs https://keda.sh/docs/2.6/scalers/prometheus/
+# Enable scaler in valuse.yaml. Set key: Values.keda.prometheus.enabled = true
+{{- if .Values.keda.prometheus.enabled -}}
+{{ if eq .Release.Namespace "production" }}
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: "prometheus-{{ .Chart.Name }}-{{ .Release.Namespace }}"
+  namespace: production
+  labels:
+    deploymentName: "prometheus-{{ .Chart.Name }}-{{ .Release.Namespace }}"
+    {{- include "quarkus-api-training.labels" . | nindent 4 }}
+spec:
+  minReplicaCount: {{ .Values.keda.prometheus.minReplicaCount }}
+  pollingInterval: {{ .Values.keda.prometheus.pollingInterval }}   # Optional. Default: 30 seconds
+  cooldownPeriod: {{ .Values.keda.prometheus.cooldownPeriod }}   # Optional. Default: 300 seconds
+  maxReplicaCount: {{ .Values.keda.prometheus.maxReplicaCount }}  # Optional. Default: 100
+  scaleTargetRef:
+    name: "{{ include "quarkus-api-training.fullname" . }}"
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: "{{ .Values.keda.prometheus.serverAddress }}"
+        metricName: container_network_receive_bytes_total
+        threshold: '{{ .Values.keda.prometheus.threshold }}'
+        query: sum(rate(container_network_receive_bytes_total{namespace="production",pod_name=~"{{ include "quarkus-api-training.fullname" . }}.*",container_name!=""}[5m]))
+{{ end }}
+{{- end }}

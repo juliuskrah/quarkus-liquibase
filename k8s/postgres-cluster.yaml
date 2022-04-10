@@ -9,7 +9,7 @@ spec:
   numberOfInstances: 2
   users:
     liqubase:
-    - CREATEDB
+    - SUPERUSER
     quarkus_owner: []
   databases:
     quarkus: quarkus_owner
