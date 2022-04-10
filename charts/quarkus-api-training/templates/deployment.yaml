@@ -87,7 +87,7 @@ spec:
           env:
   {{- range $key, $value := .Values.extraVars }}
           - name: {{ $key }}
-            value: {{ $value }}
+            value: {{ $value | toString | quote }}
   {{- end }}
           - name: QUARKUS_DATASOURCE_USERNAME
             value: asdf
