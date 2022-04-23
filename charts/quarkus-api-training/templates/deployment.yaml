@@ -27,17 +27,15 @@ spec:
         - name: URL
           value: jdbc:postgresql://payouts-liquibase-cluster/quarkus?currentSchema=liquibase
         - name: USERNAME
-          value: asdf
-          # valueFrom:
-          #   secretKeyRef:
-          #     name: liqubase.payouts-liquibase-cluster.credentials.postgresql.acid.zalan.do
-          #     key: username
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "quarkus-api-training.fullname" . }}-secret
+              key: postgres.username
         - name: PASSWORD
-          value: asdf
-          # valueFrom:
-          #   secretKeyRef:
-          #     name: liqubase.payouts-liquibase-cluster.credentials.postgresql.acid.zalan.do
-          #     key: password
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "quarkus-api-training.fullname" . }}-secret
+              key: postgres.password
         name: liquibase-migration
         image: liquibase/liquibase:4.9
         args:
@@ -79,11 +77,6 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion | default .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-{{- if .Values.service.secrets.enabled }}
-          envFrom:
-            - secretRef:
-                name: {{ include "quarkus-api-training.fullname" . }}-secret 
-{{- end }}
           env:
   {{- range $key, $value := .Values.extraVars }}
           - name: {{ $key }}

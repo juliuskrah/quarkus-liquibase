@@ -27,16 +27,6 @@ podSecurityContext: {}
 
 securityContext: {}
 
-
-#replace `SERVICE-TOLLERATION` below with one of the below:
-
-# - `instore` - service specific only for `instore`
-# - `paybylink` - service specific only for `paybylink`
-# - `tingg6platform` - shared across other services. `core services`
-# - `engage` - shared across other services. `engagement services`
-# - `tinggintegrations` - service-specific only for `payment methods`
-# - `tinggomnichannel` -  service-specific only for `tinggomnichannel`
-
 service:
   enabled: SVC_STATUS
   type: SVC_TYPE
@@ -45,7 +35,12 @@ service:
   environment: SVC_ENV
   nodegroup: "tinggintegrations"
   secrets:
-    enabled: false
+    enabled: true
+
+secret:
+  postgresql:
+    username: postgres
+    password: kew65(h12%6^g
   
 #Read more about this at the link below:
 #https://www.getambassador.io/docs/1.14/topics/using/timeouts/
