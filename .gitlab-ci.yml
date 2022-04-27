@@ -4,7 +4,7 @@ include:
     file: '.base.gitlab-ci.yml'
     
   - project: 'ops-templates/ci-cd-extensions/qa/code-quality'
-    ref: maven17
+    ref: quarkus
     file: 'Code-Quality.gitlab-ci.yml'
 
   
