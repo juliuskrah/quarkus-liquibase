@@ -8,6 +8,9 @@ import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
  * @author Julius Krah
  */
 public class SnakeCasePhysicalNamingStrategy extends PhysicalNamingStrategyStandardImpl {
+    private static final String MATCH_EXPRESSION = "([a-z]+)([A-Z]+)";
+    private static final String REPLACE_EXPRESSION = "$1\\_$2";
+
     @Override
     public Identifier toPhysicalCatalogName(Identifier name, JdbcEnvironment context) {
         return super.toPhysicalCatalogName(toSnakeCase(name), context);
@@ -38,7 +41,7 @@ public class SnakeCasePhysicalNamingStrategy extends PhysicalNamingStrategyStand
             return id;
 
         String name = id.getText();
-        String snakeName = name.replaceAll("([a-z]+)([A-Z]+)", "$1\\_$2").toLowerCase();
+        String snakeName = name.replaceAll(MATCH_EXPRESSION, REPLACE_EXPRESSION).toLowerCase();
         if (!snakeName.equals(name))
             return new Identifier(snakeName, id.isQuoted());
         else
