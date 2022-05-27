@@ -6,8 +6,8 @@ import java.util.UUID;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 
 /**
  * @author Julius Krah
@@ -19,7 +19,6 @@ public class Client implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @Id
-    @GeneratedValue
     private UUID id;
     @Column(length = 40, unique = true)
     private String name;
@@ -49,6 +48,11 @@ public class Client implements Serializable {
     }
     public void setContactPerson(String contactPerson) {
         this.contactPerson = contactPerson;
+    }
+
+    @PrePersist
+    void addId() {
+        this.id = UUID.randomUUID();
     }
     
     @Override
