@@ -5,7 +5,6 @@ import static javax.persistence.FetchType.EAGER;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
-import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -14,7 +13,6 @@ import javax.persistence.ManyToOne;
  * @author Julius Krah
  */
 @Entity
-@Cacheable
 public class Service implements Serializable {
     @Serial
     private static final long serialVersionUID = 2L;

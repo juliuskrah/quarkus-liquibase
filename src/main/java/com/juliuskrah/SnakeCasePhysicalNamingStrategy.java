@@ -1,12 +1,15 @@
 package com.juliuskrah;
 
+import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 
 /**
  * @author Julius Krah
+ * @deprecated Consider using {@link CamelCaseToUnderscoresNamingStrategy}
  */
+@Deprecated(since = "0.0.1", forRemoval = true)
 public class SnakeCasePhysicalNamingStrategy extends PhysicalNamingStrategyStandardImpl {
     private static final String MATCH_EXPRESSION = "([a-z]+)([A-Z]+)";
     private static final String REPLACE_EXPRESSION = "$1\\_$2";

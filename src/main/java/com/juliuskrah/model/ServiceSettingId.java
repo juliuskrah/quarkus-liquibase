@@ -1,5 +1,5 @@
 package com.juliuskrah.model;
-
+import static javax.persistence.FetchType.LAZY;
 import java.io.Serial;
 import java.io.Serializable;
 import javax.persistence.Embeddable;
@@ -12,11 +12,11 @@ import javax.persistence.ManyToOne;
 public class ServiceSettingId implements Serializable {
     @Serial
     private static final long serialVersionUID = 4L;
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private Service service;
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private Client receiverClient;
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private Client payerClient;
 
     public Service getService() {

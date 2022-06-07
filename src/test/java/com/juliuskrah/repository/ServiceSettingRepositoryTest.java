@@ -4,11 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import java.util.UUID;
 import javax.inject.Inject;
-import com.juliuskrah.model.Client;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import com.juliuskrah.model.Client;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.test.junit.QuarkusTest;
 
@@ -52,18 +52,22 @@ class ServiceSettingRepositoryTest {
     @Test
     @DisplayName("Test find by service id")
     void testFindByServiceId() {
-        var serviceSettings = serviceSettingRepository.findByServiceId(UUID.fromString("69fe1c30-57c0-44b4-a1cb-b398890174f3"));
-        SoftAssertions.assertSoftly(softly -> {
-            var ss = serviceSettings.collect().asList().await().indefinitely();
-            softly.assertThat(ss).as("Service setting must not be null").isNotNull();
-            softly.assertThat(ss).first()
-                .extracting("id.payerClient",
+        Panache.withTransaction(() -> 
+            serviceSettingRepository.findByServiceId(UUID.fromString("69fe1c30-57c0-44b4-a1cb-b398890174f3")).collect().asList()
+        )
+        .invoke(serviceSettings -> {
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(serviceSettings).as("Service setting must not be null").isNotNull();
+                softly.assertThat(serviceSettings).hasSize(3);
+                softly.assertThat(serviceSettings).first()
+                    .extracting("id.payerClient",
+                        InstanceOfAssertFactories.type(Client.class)
+                ).hasFieldOrPropertyWithValue("id", UUID.fromString("ce74d8f2-ef49-4f2a-b5cc-52ef30046d40"));
+                softly.assertThat(serviceSettings).last()
+                    .extracting("id.receiverClient",
                     InstanceOfAssertFactories.type(Client.class)
-            ).hasFieldOrPropertyWithValue("name", "acme corporation");
-            softly.assertThat(ss).last()
-                .extracting("id.receiverClient",
-                InstanceOfAssertFactories.type(Client.class)
-            ).hasFieldOrPropertyWithValue("name", "hey foods");
-        });
+                ).hasFieldOrPropertyWithValue("id", UUID.fromString("b0c02363-5031-4c0c-9a83-f242df4039b1"));
+            });
+        }).subscribeAsCompletionStage().join();
     }
 }
