@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -38,6 +39,7 @@ public class ClientResource {
         return clientService.findAllClients();
     }
 
+    @Transactional
     @POST @Path("/")
     public Uni<Response> createClient(ClientWithServices client) {
         return clientService.addClient(client).map(inserted -> 
