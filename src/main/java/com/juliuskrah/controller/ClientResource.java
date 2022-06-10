@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -14,6 +13,7 @@ import com.juliuskrah.dto.ClientWithServices;
 import com.juliuskrah.dto.ServiceDto;
 import com.juliuskrah.service.ClientService;
 import com.juliuskrah.service.CompanyService;
+import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
@@ -39,8 +39,8 @@ public class ClientResource {
         return clientService.findAllClients();
     }
 
-    @Transactional
     @POST @Path("/")
+    @ReactiveTransactional
     public Uni<Response> createClient(ClientWithServices client) {
         return clientService.addClient(client).map(inserted -> 
             Response.created(URI.create("/clients/" + inserted.id())).entity(inserted).build()

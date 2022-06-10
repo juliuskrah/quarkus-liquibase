@@ -79,7 +79,7 @@ class ClientServiceTest {
         client.setName("Test");
         client.setContactPerson("Test Test");
 
-        when(clientRepository.persistAndFlush(any(Client.class))).thenReturn(Uni.createFrom().item(client));
+        when(clientRepository.persist(any(Client.class))).thenReturn(Uni.createFrom().item(client));
         var clientUni = clientService.addClient(new ClientWithServices(null, null, null, null, null));
 
         UniAssertSubscriber<ClientWithServices> subscriber = clientUni.subscribe().withSubscriber(UniAssertSubscriber.create());
@@ -87,7 +87,7 @@ class ClientServiceTest {
         assertThat(c).isNotNull()
             .extracting("services", InstanceOfAssertFactories.LIST)
             .hasOnlyElementsOfType(ServiceDto.class).isEmpty();
-        verify(clientRepository, only()).persistAndFlush(any(Client.class));
+        verify(clientRepository, only()).persist(any(Client.class));
     }
 
 }

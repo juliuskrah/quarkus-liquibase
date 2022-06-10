@@ -64,7 +64,7 @@ public class ClientServiceImpl implements ClientService {
      */
     @Override
     public Uni<ClientWithServices> addClient(ClientWithServices client) {
-        return clientRepository.persistAndFlush(fromClientDto(client)).map(this::toClientDto);
+        return clientRepository.persist(fromClientDto(client)).map(this::toClientDto);
     }
     
 }
