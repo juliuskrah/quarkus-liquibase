@@ -2,9 +2,6 @@
 Please read this!
 
 Before opening a new issue, make sure to search for keywords in the issues filtered by "bug" label:
-
-- https://thanos.cellulant.africa/dashboard/issues?sort=created_date&state=opened&label_name[]=bug
-
 and verify the issue you're about to submit isn't a duplicate
 
 --->

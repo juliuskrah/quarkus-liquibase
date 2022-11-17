@@ -1,10 +1,18 @@
-# Liquibase Project
+# Running Liquibase in the Cloud using Kubernetes
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+This project contains a demo for running `Liquibase` migration as an init container in a Kubernetes environment
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+## Getting started
 
-## Native docker image
+Before you're able to run this demo, you need the following already setup on your development environment
+
+- Kubernetes
+  - [kind](https://kind.sigs.k8s.io/)
+  - [minikube](https://minikube.sigs.k8s.io/docs/start/)
+  - [Docker Desktop](https://docs.docker.com/desktop/kubernetes/) with Kubernetes enabled on Mac or PC
+- [cURL](https://curl.se/)
+
+## Building a native docker image
 
 ```shell script
 ./mvnw package -Pnative -Dquarkus.native.container-build=true -Dquarkus.container-image.build=true
@@ -13,9 +21,48 @@ If you want to learn more about Quarkus, please visit its website: https://quark
 ## Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:
+
 ```shell script
 ./mvnw compile quarkus:dev
 ```
+
+The following operations have been defined
+
+1. GET http://localhost:8080/clients/:id
+   
+   ```shell script
+   curl --location --request GET 'http://localhost:8080/clients/ce74d8f2-ef49-4f2a-b5cc-52ef30046d40'
+   ```
+
+2. GET http://localhost:8080/clients
+
+   ```shell script
+   curl --location --request GET 'http://localhost:8080/clients'
+   ```
+
+3. POST http://localhost:8080/clients
+
+   ```shell script
+   curl --location --request POST 'http://localhost:8080/clients' \
+   --header 'Content-Type: application/json' \
+   --data-raw '{
+       "name": "evil corp",
+       "code": "EVIL",
+       "contactPerson": "Tyrell Wellick"
+   }'
+   ```
+
+4. GET http://localhost:8080/clients/:code/code
+
+   ```shell script
+   curl --location --request GET 'http://localhost:8080/clients/acme/code'
+   ```
+
+5. GET http://localhost:8080/clients/:clientCode/services
+
+   ```shell script
+   curl --location --request GET 'http://localhost:8080/clients/acme/services'
+   ```
 
 > **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
 
@@ -50,30 +97,3 @@ Or, if you don't have GraalVM installed, you can run the native executable build
 ```
 
 You can then execute your native executable with: `./target/liquibase-demo-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
-
-## Related Guides
-
-- RESTEasy Reactive ([guide](https://quarkus.io/guides/resteasy-reactive)): Reactive implementation of JAX-RS with additional features. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it.
-- Reactive PostgreSQL client ([guide](https://quarkus.io/guides/reactive-sql-clients)): Connect to the PostgreSQL database using the reactive pattern
-
-## Further Reading
-
-- https://quarkus.io/version/main/guides/hibernate-orm-panache
-- https://quarkus.io/guides/getting-started-reactive
-
-
-- Repositories
-- Services
-- Controllers
-- Tests
-- Native Build
-- JaCoCo
-
-
-History of Quarkus
-- Wildfly: JavaEE
-- Wildfly Swarm
-- Thorntail: Microprofile
-- Quarkus: Jakarta EE / Microprofile
