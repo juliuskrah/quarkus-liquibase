@@ -1,10 +1,12 @@
 name: run-unit-tests
+run-name: A job to run unit tests on ${{ github.action_repository }}; started by @${{ github.actor }}
 on: 
-  push:
-  release:
-    types: ['published']
+  # push:
+  # release:
+  #   types: ['published']
+  workflow_call:
 jobs:
-  unit-test:
+  unit-test-template:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
