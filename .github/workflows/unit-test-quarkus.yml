@@ -4,4 +4,4 @@ on: ['push']
 
 jobs:
   unit-test:
-    uses: ./.github/workflows/unit-test-quarkus-resuable.yml@42d8653e3d5f3426a73fd8d3c1041fb6f78ad0db
+    uses: ./.github/workflows/unit-test-quarkus-reusable.yml
