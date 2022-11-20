@@ -1,6 +1,8 @@
 name: build-and-publish-docker-image
 run-name: A job to run build and push docker image on ${{ github.repository }}; started by @${{ github.actor }}
-on: [push]
+on:
+  release:
+    types: ['published']
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
