@@ -60,6 +60,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: deployment-artifact
+          path: target
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
