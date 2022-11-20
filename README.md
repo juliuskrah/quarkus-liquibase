@@ -6,7 +6,7 @@ This project contains a demo for running `Liquibase` migration as an init contai
 
 Before you're able to run this demo, you need the following already setup on your development environment
 
-- Kubernetes
+- Kubernetes: either one of the following
   - [kind](https://kind.sigs.k8s.io/)
   - [minikube](https://minikube.sigs.k8s.io/docs/start/)
   - [Docker Desktop](https://docs.docker.com/desktop/kubernetes/) with Kubernetes enabled on Mac or PC

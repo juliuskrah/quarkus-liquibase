@@ -1,0 +1,7 @@
+name: run-unit-tests
+run-name: A job to run unit tests on ${{ github.action_repository }}; started by @${{ github.actor }}
+on: ['push']
+
+jobs:
+  unit-test:
+    uses: ./.github/workflows/unit-test-quarkus-reusable.yml

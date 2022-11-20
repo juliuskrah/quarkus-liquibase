@@ -1,0 +1,19 @@
+name: run-unit-tests
+run-name: A job to run unit tests on ${{ github.action_repository }}; started by @${{ github.actor }}
+on: 
+  # push:
+  # release:
+  #   types: ['published']
+  workflow_call:
+jobs:
+  unit-test-template:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17.0'
+        cache: 'maven'
+    - name: Unit test with Maven
+      run: mvn test --file pom.xml
