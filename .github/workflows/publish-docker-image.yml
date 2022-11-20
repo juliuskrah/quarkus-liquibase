@@ -46,7 +46,7 @@ jobs:
       packages: write
     needs: build
     steps:
-      # - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
