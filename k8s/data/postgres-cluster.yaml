@@ -1,11 +1,11 @@
 apiVersion: "acid.zalan.do/v1"
 kind: postgresql
 metadata:
-  name: payouts-liquibase-cluster
+  name: example-liquibase-cluster
   labels:
-    app.kubernetes.io/name: payouts-liquibase-cluster
+    app.kubernetes.io/name: example-liquibase-cluster
 spec:
-  teamId: payouts
+  teamId: example
   numberOfInstances: 2
   users:
     liqubase:
