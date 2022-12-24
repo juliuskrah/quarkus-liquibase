@@ -1,0 +1,78 @@
+name: DH Automatic Load Tests
+run-name: Load tests started by @${{ github.actor }} on ${{ inputs.repository }}
+on:
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: "clone repository"
+        required: false
+        default: 'foo/bar'
+      clusterName:
+        description: "k8s cluster"
+        required: true
+        default: "staging-eu1"
+        type: choice
+        options:
+          - staging-eu1
+          - staging-us1
+          - ode
+      entity:
+        description: "DH Entity"
+        required: true
+        default: "fp-pk"
+        type: choice
+        options:
+          - dj-cz
+          - ef-gr
+          - ex-cr
+          - fo-no
+          - fp-bd
+          - fp-bg
+          - fp-de
+          - fp-hk
+          - fp-jp
+          - fp-kh
+          - fp-la
+          - fp-mm
+          - fp-my
+          - fp-ph
+          - fp-pk
+          - fp-ro
+          - fp-sg
+          - fp-sk
+          - fp-th
+          - fp-tw
+          - hc-ph
+          - hf-eg
+          - hn-dk
+          - hs-sa
+          - mjm-at
+          - np-hu
+          - op-se
+          - po-fi
+          - tb-ae
+          - tb-bh
+          - tb-iq
+          - tb-jo
+          - tb-kw
+          - tb-om
+          - tb-qa
+          - te-st
+          - ys-tr
+      environment:
+        description: "Environment to run tests against"
+        type: environment
+        required: false
+
+jobs:
+  log-the-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Kubernetes cluster: $CLUSTER"
+          echo "Entitu: $ENTITY"
+          echo "Environment: $ENVIRONMENT"
+        env:
+          CLUSTER: ${{ inputs.clusterName }}
+          ENTITY: ${{ inputs.entity }}
+          ENVIRONMENT: ${{ inputs.environment }}

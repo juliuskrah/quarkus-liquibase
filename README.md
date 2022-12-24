@@ -11,8 +11,8 @@ Before you're able to run this demo, you need the following already setup on you
 - Kubernetes: either one of the following
   - [kind](https://kind.sigs.k8s.io/)
   - [minikube](https://minikube.sigs.k8s.io/docs/start/)
-  - [helm](https://helm.sh/)
   - [Docker Desktop](https://docs.docker.com/desktop/kubernetes/) with Kubernetes enabled on Mac or PC
+- [helm](https://helm.sh/)
 - [cURL](https://curl.se/)
 
 
